@@ -17,7 +17,10 @@ client = discord.Client(intents=intents)
 
 def get_available_logos(logo_dir: Path, last_used_logo: Path | None) -> list[Path]:
     """Get list of available logos, excluding the last used one."""
-    logo_files = list(logo_dir.glob('*.png')) + list(logo_dir.glob('*.jpg'))
+    # Use case-insensitive glob for better cross-platform compatibility
+    logo_files = []
+    for ext in ['*.png', '*.jpg', '*.PNG', '*.JPG']:
+        logo_files.extend(list(logo_dir.glob(ext)))
     
     if not logo_files:
         print("No logo files found in the logos directory!")
@@ -41,10 +44,17 @@ def get_random_interval() -> int:
 
 async def update_server_icon(guild: discord.Guild, logo_path: Path) -> None:
     """Update the server icon with the given logo."""
-    with open(logo_path, 'rb') as image:
-        icon_bytes = image.read()
-    await guild.edit(icon=icon_bytes)
-    print(f"Updated server icon to: {logo_path.name}")
+    try:
+        with open(logo_path, 'rb') as image:
+            icon_bytes = image.read()
+        await guild.edit(icon=icon_bytes)
+        print(f"Updated server icon to: {logo_path.name}")
+    except discord.HTTPException as e:
+        print(f"Discord API error while updating icon: {e}")
+        raise
+    except Exception as e:
+        print(f"Error reading or updating icon: {e}")
+        raise
 
 async def cycle_logo():
     await client.wait_until_ready()
@@ -60,7 +70,11 @@ async def cycle_logo():
                 return
 
             # Get available logos
-            logo_dir = Path('logos')
+            logo_dir = Path('logos').resolve()  # Resolve to absolute path
+            if not logo_dir.exists():
+                print(f"Logos directory not found at: {logo_dir}")
+                return
+                
             available_logos = get_available_logos(logo_dir, last_used_logo)
             if not available_logos:
                 return

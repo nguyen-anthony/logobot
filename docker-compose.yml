@@ -2,10 +2,15 @@ version: '3.8'
 
 services:
   discord-bot:
-    build: .
+    build: 
+      context: .
+      platform: linux/amd64
     container_name: discord-logo-cycler
     volumes:
-      - ./logos:/app/logos
+      - type: bind
+        source: ./logos
+        target: /app/logos
+        read_only: true
     env_file:
       - .env
     restart: unless-stopped
