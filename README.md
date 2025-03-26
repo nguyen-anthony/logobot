@@ -31,7 +31,6 @@ A simple Python script that automatically cycles through server logos/icons for 
    - Copy `.env.example` to `.env`
    - Add your bot token
    - Add your server (guild) ID
-   - Optionally adjust the cycle interval (in seconds)
 
 5. Invite the bot to your server:
    - Go to OAuth2 > URL Generator in the Developer Portal
@@ -108,7 +107,7 @@ The script will:
 
 ## Notes
 
-- The default cycle interval is 1 hour (3600 seconds)
+- The logo will cycle sometime between 3 to 8 hours, randomly decided
 - The script will randomly select from all PNG and JPG files in the `logos` directory
 - Make sure your bot has the "Manage Server" permission
 - Server icons must be square images
